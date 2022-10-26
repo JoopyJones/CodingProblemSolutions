@@ -40,7 +40,7 @@ public class RemoveDuplicatesInPlace {
 		//next position to move a duplicate to
 		int swapPos = _input.length-1;
 		
-		//the counter for moving the duplicate
+		//the counter for moving the duplicate.
 		int j = 0;
 		
 		for(int i=0; i <swapPos;i++)
