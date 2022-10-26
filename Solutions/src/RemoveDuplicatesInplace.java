@@ -1,3 +1,4 @@
+
 /*
 
 	Given an integer array nums sorted in non-decreasing order, 
@@ -25,15 +26,21 @@ public class RemoveDuplicatesInPlace {
 	public static void main(String[] args) {
 		int[] nums = new int[] {0,0,1,1,1,2,2,3,3,4};
 
-		int ret = removeDups(nums);
+		int ret = removeDupsBetter(nums);
+		System.out.println("Result is: " + ret);
 		
 	}
 
-	//TODO - figure out how to deal with more than 2 equal consecutive numbers.
-	//have the right idea, but implementation is wrong. Also consider starting from end of array.
+	//my original attempt. It works, but is inefficient.
+	//idea was to continuously swap the duplicate element to the end of the array, after which
+	//	would leave only unique values at the beginning of array.
+	@SuppressWarnings("unused")
 	private static int removeDups(int[] _input)
 	{
+		//next position to move a duplicate to
 		int swapPos = _input.length-1;
+		
+		//the counter for moving the duplicate
 		int j = 0;
 		
 		for(int i=0; i <swapPos;i++)
@@ -44,14 +51,18 @@ public class RemoveDuplicatesInPlace {
 				while(j < swapPos)
 				{
 					swapPos(_input,j++);
-					System.out.print("After Swap: ");
-					printArray(_input);
+//					System.out.print("After Swap: ");
+//					printArray(_input);
 				}
 				
 				swapPos--;
+				
+				//decrement current index just in case we moved another duplicate into current position.
+				i--;
 			}
 		}
 		
+		//swapPos will hold the index of the last valid element, but we need to return the length of the valid elements
 		return swapPos+1;
 	}
 	
@@ -62,6 +73,7 @@ public class RemoveDuplicatesInPlace {
 		_arr[_i+1] = temp;
 	}
 	
+	@SuppressWarnings("unused")
 	private static void printArray(int[] _arr)
 	{
 		System.out.print("[");
@@ -70,5 +82,32 @@ public class RemoveDuplicatesInPlace {
 			System.out.print(i + " ");
 		}
 		System.out.println("]");
+	}
+	
+	//solution from leetcode
+	//idea is to have two pointers - left pointer to point to next index to place a unique value,
+	//	and a right pointer to search right to find next unique value.
+	private static int removeDupsBetter(int[] _input)
+	{
+		//left pointer will point to next index to place next unique value.
+		//this also means that lp's value is the number of unique values found.
+		int lp = 1;
+		
+		//rp will keep looking right until it finds the next unique value.
+		int rp = 1;
+		
+		while(rp<_input.length)
+		{
+			//compare to see if we have a new unique number.
+			if(_input[rp] != _input[rp-1])
+			{
+				//we found a new unique number, put it in index pointed to by lp, then increment lp.
+				_input[lp++] = _input[rp];
+			}
+			rp++;
+		}
+		
+		//lp will contain the number of unique elements found, or lp-1 for the last index subarray of unique values.
+		return lp;
 	}
 }
