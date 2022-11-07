@@ -14,10 +14,11 @@ public class BubbleSort {
 		
 		printArray(nums);
 		
-		//TODO add in functionality so that on the first pass, if no swaps occur, then exit - the array is sorted
 		//run this algorithm for the number of indices except the last one.
 		// nums.length-1 because the 2nd to last element will check the last element. Without it, get an out of bounds error
 		for(int i = 0; i<nums.length-1;i++) {
+			boolean isSorted = true;
+			
 			//compare each index with the next index and swap if current index is larger
 			for(int j=0; j<nums.length-1;j++) {
 				int c = nums[j];
@@ -25,7 +26,14 @@ public class BubbleSort {
 				
 				if(c > n) {
 					swap(nums, j, j+1);
+					isSorted = false;
 				}
+			}
+			
+			//no swaps occurred, list is sorted
+			if(isSorted)
+			{
+				break;
 			}
 		}
 		

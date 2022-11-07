@@ -14,7 +14,7 @@ public class InsertionSort {
 		printArray(nums);
 		
 		//start at index 1
-		for(int i = 1; i <nums.length-1;i++) {
+		for(int i = 1; i <nums.length;i++) {
 			int j = i;
 			
 			//compare and swap items to the left until a smaller or equal number is met

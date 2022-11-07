@@ -21,18 +21,18 @@ public class MergeSort {
 	public static void mergeSort(int[] _arr) {
 		if(_arr.length > 1) {
 			
-			//determine what half of the current array is
+			//determine what half of the current array is.
 			//using ceiling in the scenario we have odd length, we will have the left array be the larger one.
 			// ex) 7 = [4] & [3] or 3 = [2] & [1].
 			int half = (int)Math.ceil(_arr.length/2);
 			
-			int[] leftHalf = new int[_arr.length-half];
-			int[] rightHalf = new int[half];
+			int[] leftHalf = new int[half];
+			int[] rightHalf = new int[_arr.length-half];
 			
 			//fill up the left and right sub arrays.
-			//i will fill up left array, j will fill up right, i used as main array index
-			for(int i=0,j=0; i<= _arr.length-1;i++) {
-				if(i <= leftHalf.length-1) {
+			//i will fill up left array, j will fill up right, i used as main array index.
+			for(int i=0,j=0; i< _arr.length;i++) {
+				if(i < leftHalf.length) {
 					leftHalf[i] = _arr[i];
 				}
 				else
@@ -43,7 +43,7 @@ public class MergeSort {
 			}
 			
 			//now that we divided the array in half, let's divide the halves in half.
-			//this call will return once we divide down to single element arrays
+			//this call will return once we divide down to single element arrays.
 			mergeSort(leftHalf);
 			mergeSort(rightHalf);
 			
