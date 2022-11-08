@@ -5,8 +5,13 @@ public class BinarySearchTreeExample {
 	//this is the root node.
 	Node head;
 	
-	//temporary array used when rebalancing the tree
+	//temporary array used when balancing the tree.
 	ArrayList<Node> sortedArray;
+	
+	//flag to keep the tree from balancing itself while it is being balanced.
+	//during balancing, the tree is not balanced after every node addition. this will cause the 
+	//	tree to try to balance itself during re-balancing.
+	boolean okayToBalance = true;
 
 	public static void main(String[] args) {
 		
@@ -14,35 +19,26 @@ public class BinarySearchTreeExample {
 		
 		tree.addNode(new Node(10));
 		tree.addNode(new Node(6));
-//		tree.addNode(new Node(8));
-//		tree.addNode(new Node(7));
-//		tree.addNode(new Node(9));
 		tree.addNode(new Node(2));
 		tree.addNode(new Node(1));
 		tree.addNode(new Node(5));
-		tree.addNode(new Node(14));
 		tree.addNode(new Node(11));
+		tree.addNode(new Node(14));
 		tree.addNode(new Node(15));
-		
-		System.out.println(tree.isBalanced(tree.head));
 		
 		tree.preOrderTraversal(tree.head);
 		System.out.println("---------------------------");
-		tree.balanceTree();
 		
-		tree.preOrderTraversal(tree.head);
-		
-		System.out.println(tree.isBalanced(tree.head));
 		
 				
 		
 	}
 	
-	//this function adds a node to the tree by comparing the current node to the new node, and looking down the subtree to find an empty spot for it.
-	//TODO - add blananceTree to this function once implemented.
-	public void addNode(Node _newNode) {
-
-		
+	//this function adds a node to the tree by comparing the current node to the new node, 
+	//	and looking down the subtree to find an empty spot for it.
+	//after the node is inserted, the tree will re-balance itself if needed.
+	public void addNode(Node _newNode) 
+	{	
 		//Empty tree, add node as root
 		if(this.head == null)
 		{
@@ -68,9 +64,9 @@ public class BinarySearchTreeExample {
 					{
 						parent.setLeft(_newNode);
 						
-						if(isBalanced(this.head) == false)
+						if(isBalanced(this.head) == false && this.okayToBalance)
 						{
-							this.balanceTree();
+							balanceTree();
 						}
 						
 						return;
@@ -86,9 +82,9 @@ public class BinarySearchTreeExample {
 					{
 						parent.setRight(_newNode);
 						
-						if(isBalanced(this.head) == false)
+						if(isBalanced(this.head) == false && this.okayToBalance)
 						{
-							this.balanceTree();
+							balanceTree();
 						}
 						
 						return;
@@ -100,7 +96,8 @@ public class BinarySearchTreeExample {
 
 	//find and delete a node from the tree.
 	//Steps: 1. find node, swap with successor/predecessor if child =2, then delete from tree.
-	//TODO - add blananceTree to this function once implemented.
+	//after node is deleted, rebalance tree if needed.
+	//TODO - test tree balancing for removal.
 	public void deleteNode(int _x)
 	{
 		Node[] targetFamily = getNode(_x);
@@ -217,13 +214,13 @@ public class BinarySearchTreeExample {
 				if(targetNode == targetParent.getLeft())
 				{
 					targetParent.setLeft(targetRight);
-					targetNode.setRight(null);
 				}
 				else
 				{
 					targetParent.setRight(targetRight);
-					targetNode.setRight(null);
 				}
+				
+				targetNode.setRight(null);
 			}
 			//target only has a left subtree, set the target's new subtree in target's place
 			else
@@ -231,17 +228,17 @@ public class BinarySearchTreeExample {
 				if(targetNode == targetParent.getLeft())
 				{
 					targetParent.setLeft(targetLeft);
-					targetNode.setLeft(null);
 				}
 				else
 				{
 					targetParent.setRight(targetLeft);
-					targetNode.setLeft(null);
 				}
+				
+				targetNode.setLeft(null);
 			}
 			
 			
-			if(isBalanced(this.head) == false)
+			if(isBalanced(this.head) == false && this.okayToBalance)
 			{
 				this.balanceTree();
 			}
@@ -250,49 +247,52 @@ public class BinarySearchTreeExample {
 	}
 	
 	
-	//TODO - there may be a better way to do this, but this will be the first attempt.
-	//idea = copy BST to array using inorder traversal, then take the mid of the array, set as root, then do the same for the left and right sub arrays.
+	
+	//idea = copy BST to array using inorder traversal, then take the mid of the array, set as root, 
+	//	then do the same for the left and right sub arrays.
 	private void balanceTree()
 	{
 		if(this.head != null)
 		{
-			int treeSize = this.getSize(this.head);
-			
+			//lock the tree from balancing.
+			this.okayToBalance = false;
 			this.sortedArray = new ArrayList<>();
 			
-			//adds the tree to the array in sorted order
-			this.inOrderAddToArray(this.head);
+			int treeSize = this.getSize(this.head);
 			
-			//get rid of current tree
+			//adds the tree to the array in sorted order.
+			inOrderAddToArray(this.head);
+			
+			//get rid of current tree.
 			this.head = null;
 			
-			//build a new tree from the array values
+			//build a new tree from the array values.
 			balanceTreeUtil(this.sortedArray, 0, treeSize-1);
 			
-			//clear temporary array
+			//clear temporary array, unlock the tree from balancing.
 			this.sortedArray.clear();
+			this.okayToBalance = true;
 		}
 	}
 	
 	private void balanceTreeUtil(ArrayList<Node> _x, int _start, int _end)
 	{
-		//TODO describe what cases this if is for. too tired to remember now. Sometimes start > end.
+		//start is greater than end when last index of main array is a middle element. tries to look right of the end index.
 		if(_start <= _end)
 		{
 			//for sections with more than 1 element
 			if(_end != _start)
 			{
-				//find the middle index of the current section.
-				//mid is the index that we will act as a partition
+				//find the middle index of the current section - this will be our partition.
 				int mid = (int)Math.floor((_end+_start+1)/2);
 				
-				//mid is the next item we will add to tree
+				//mid is the next item we will add to tree.
 				this.addNode(_x.get(mid));
 				
-				//divide section left of mid
+				//divide section left of partition.
 				balanceTreeUtil(_x, _start, mid-1);
 				
-				//divide section right of mid
+				//divide section right of partition.
 				balanceTreeUtil(_x,mid+1, _end);
 			}
 			//single element section, no divide necessary. 
@@ -399,7 +399,7 @@ public class BinarySearchTreeExample {
 			else if(focusNode.getRight() == null && parent.getRight() == focusNode)
 			{
 				//if the node is the rightmost node, there is no successor
-				if(focusNode != this.getRightMost(this.head))
+				if(focusNode == this.getRightMost(this.head))
 				{
 					return null;
 				}
@@ -446,7 +446,7 @@ public class BinarySearchTreeExample {
 			else if(focusNode.getLeft() == null && parent.getLeft() == focusNode)
 			{
 				//if the node is the leftmost node, then there is no predecessor
-				if(focusNode != this.getLeftMost(this.head))
+				if(focusNode == this.getLeftMost(this.head))
 				{
 					return null;
 				}
@@ -589,18 +589,6 @@ public class BinarySearchTreeExample {
 		return balanced;
 	}
 	
-	//TODO print the tree in a nice format
-	public void printTree()
-	{
-		String buffer = "          ";
-		Node focusNode = this.head;
-		
-		while(focusNode.getLeft() != null || focusNode.getRight() != null)
-		{
-			
-		}
-		
-	}
 	
 	private int getSize(Node _x)
 	{
