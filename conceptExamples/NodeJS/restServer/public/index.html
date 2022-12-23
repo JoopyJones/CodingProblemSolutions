@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="text"></h1>
+    <script>
+
+        const post = async function(){
+            const data = {
+            data1: Math.floor(Math.random()*3)
+        };
+
+        //this determines what type of request is made and what is sent along with it
+        const reqOptions ={ 
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json' //this line tells the server what format the data is in
+            },
+            body: JSON.stringify(data) //convert the data to JSON format
+        };
+
+        const response = await fetch('/',reqOptions); //use the fetch to make a request to the server, returns a promise
+        const x = await response.json();    //converts the promise to JSON
+        console.log(x.divData);
+
+        document.getElementById('text').outerHTML=x.divData;
+        }
+
+
+        post();
+    </script>
+</body>
+</html>
